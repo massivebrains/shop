@@ -1,0 +1,27 @@
+#simplemodal-overlay {
+	background-color: #000;
+}
+#simplemodal-container {
+	background-color: #333;
+	border: 1px solid #444;
+	margin: 0px;
+	padding: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+#simplemodal-container a.modalCloseImg {
+	background:url(../images/close-x.png) no-repeat;
+	width: 15px;
+	height: 15px;
+	display: block;
+	z-index: 3200;
+	position: absolute;
+	top: 14px;
+    right: 22px;
+	cursor: pointer;
+    text-indent: -9999px;
+}
