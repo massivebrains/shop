@@ -20,8 +20,8 @@
 
               <form class="" action="<?=site_url('checkout/guest_details') ?>" method="post">
                 <label for="delivery_option"><h3>Delivery Option</h3></label>
-                <input type="radio" name="delivery_option" value="pick_up">&nbsp; &nbsp;Pickup At Branch<br />
-                <input type="radio" name="delivery_option" value="address">&nbsp; &nbsp;Deliver to the address below<br />
+                <input type="radio" name="delivery_option" value="pick_up"  checked>&nbsp; &nbsp;Pickup At Branch<br />
+                <input type="radio" name="delivery_option" value="address" >&nbsp; &nbsp;Deliver to the address below<br />
                 <hr /><br />
                 <label for="address">Full Contact Address</label><br/>
                 <textarea name="address" rows="8" cols="40" placeholder="Full Contact Address"></textarea><br />

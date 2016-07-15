@@ -1,5 +1,4 @@
 	<?php
-
 	function admin_url()
 	{
 		return site_url('backend/index');
@@ -163,4 +162,17 @@
 	function currency($number = 0)
 	{
 		return APP_CURRENCY.number_format(intval($number),2);
+	}
+
+	function clear_cache()
+	{
+		$CI = & get_instance();
+		$CI->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
+    $CI->output->set_header("Pragma: no-cache");
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		return true;
 	}

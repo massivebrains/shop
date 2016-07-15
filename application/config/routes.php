@@ -65,5 +65,7 @@ $route['account/(:any)'] = 'shop/home/account/$1';
 $route['category/(:any)'] = 'shop/home/category/$1';
 $route['search'] = 'shop/home/search';
 $route['search-by-price/(:any)'] = 'shop/home/search_by_price/$1';
+$route['paymentcomplete/(:any)'] = 'shop/order/paymentcomplete/$1';
+$route['thank-you'] = 'shop/home/thank_you';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

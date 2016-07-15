@@ -1,5 +1,5 @@
 RewriteEngine on
-RewriteBase /mentor/wetindey
+RewriteBase /mentor/shop
 
 # Prevent CI index.php
 RewriteCond %{REQUEST_FILENAME} !-f

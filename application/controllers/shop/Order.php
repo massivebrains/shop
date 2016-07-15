@@ -8,6 +8,9 @@ class Order extends CI_Controller {
 		parent::__construct();
 		$this->load->library('cart');
 		$this->cart->product_name_safe = FALSE;
+		$this->load->model('orders_model');
+		clear_cache();
+
 	}
 
 	public function index()
@@ -74,7 +77,7 @@ class Order extends CI_Controller {
 			else
 			$subtotal = $cart[$rowid]['subtotal'];
 			$total = $this->cart->total();
-			echo json_encode(array('message'=>1, 'subtotal'=>$subtotal, 'total'=>$total));
+			echo json_encode(array('message'=>1, 'subtotal'=>currency($subtotal), 'total'=>currency($total)));
 		} else {
 			echo 500;
 		}
@@ -241,7 +244,6 @@ class Order extends CI_Controller {
 	//Calls the payment gateway
 	public function payment_gateway($order_id)
 	{
-		$this->session->set_userdata('order_id', $order_id);
 		//The order row form db.
 		$order = get_row(TABLE_ORDERS, array('id'=>$order_id));
 		//Cash Envoy Merchant ID
@@ -262,7 +264,7 @@ class Order extends CI_Controller {
 		$data['cash_envoy_transaction_description'] = 'Puchase of Groceries Items from Wetindey Online Shop';
 		// notify url - absolute url of the page to which the user should be directed after payment
 		// an example of the code needed in this type of page can be found in example_requery_usage.php
-		$data['cash_envoy_notify_url'] = 'http://www.wetindey.com.ng/shop/order/paymentcomplete';
+		$data['cash_envoy_notify_url'] = 'http://www.wetindey.com.ng/shop/order/paymentcomplete/'.$order->order_number;
 		//Generate request signature
 		$con = $key.$data['cash_envoy_transction_reference'].$data['cash_envoy_amount'];
 		$data['signature'] = hash_hmac('sha256', $con, $key, false);
@@ -317,12 +319,12 @@ class Order extends CI_Controller {
 	}
 
   // what gets invoked after an api call.
-	public function paymentcomplete()
+	public function paymentcomplete($order_number = '')
 	{
-		$order_id = $this->session->userdata('order_id');
-		$order = get_row(TABLE_ORDERS, array('id'=>$order_id));
+		$this->__clearcache();
+		$order = get_row(TABLE_ORDERS, array('order_number'=>$order_number));
 		$response = $this->requery_payment($order->order_number);
-		$save['order_id'] = $order_id;
+		$save['order_id'] = $order->id;
 		$save['requery_count'] = 0;
 		$save['created'] = date('Y-m-d H:i:s');
 		if(count($response) === 3) {
@@ -330,24 +332,26 @@ class Order extends CI_Controller {
 			$save['returned_status'] = $response[1];
 			$save['returned_amount'] = $response[2];
 			$this->orders_model->save_returned_payment_data($save);
+			//var_dump($response);
 			$this->complete();
 		} else {
 			$save['error_string'] = $response[0];
 			$this->orders_model->save_returned_payment_data($save);
 			$this->payment_gateway_error();
+			$this->__clearcache();
 		}
 	}
 
 	//After pay on delivery or succesfull online payment.
 	public function complete()
 	{
-		$this->cart->destroy();
-		$this->load->view('frontend/cart/complete');
+		redirect('thank-you', 'refresh');
 	}
 
 	public function payment_gateway_error()
 	{
 		$this->cart->destroy();
+		$this->__clearcache();
 		$this->load->view('frontend/cart/payment_gateway_error');
 	}
 
@@ -355,9 +359,29 @@ class Order extends CI_Controller {
  // If Cancel and order option at checkout.
 	public function destroy_sessions()
 	{
+		foreach($this->cart->contents() as $row)
+		{
+			$data = array('rowid'=>$row['rowid'], 'qty'=>0);
+			$this->cart->update($data);
+		}
+
 		$this->cart->destroy();
 		$this->session->sess_destroy();
+		$this->__clearcache();
 		return true;
 	}
+
+	private function __clearcache()
+	{
+		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
+    $this->output->set_header("Pragma: no-cache");
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		return true;
+	}
+
 
 }

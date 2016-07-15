@@ -6,6 +6,7 @@ class Home extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		clear_cache();
 
 	}
 
@@ -17,6 +18,7 @@ class Home extends CI_Controller {
 
 	public function home()
 	{
+		clear_cache();
 		$this->load->library('pagination');
 		$config['base_url'] = site_url('home');
 		$config['total_rows'] = table_count(TABLE_PRODUCTS);
@@ -171,6 +173,19 @@ class Home extends CI_Controller {
 		$this->session->sess_destroy();
 		unset($_SESSION['customer_id']);
 		redirect('shop');
+	}
+
+	public function thank_you()
+	{
+		$this->load->library('cart');
+		foreach($this->cart->contents() as $row)
+		{
+			$data = array('rowid'=>$row['rowid'], 'qty'=>0);
+			$this->cart->update($data);
+		}
+		$this->cart->destroy();
+		$this->session->sess_destroy();
+		$this->load->view('frontend/cart/complete');
 	}
 
 
