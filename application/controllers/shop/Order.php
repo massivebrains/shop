@@ -214,7 +214,7 @@ class Order extends CI_Controller {
 		if(customer_is_logged_in()){
 			$data['customer_type'] = 'customer';
 			$data['customer_id'] = $this->session->userdata('customer_id');
-			$data['guest_email'] = ' ';
+			$data['guest_email'] = '--';
 		}else{
 			$data['customer_type'] = 'guest';
 			$data['guest_email'] = $this->session->userdata('guest_email');

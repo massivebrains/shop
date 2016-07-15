@@ -109,13 +109,17 @@ class Home extends CI_Controller {
 		$this->load->view('frontend/home/single', $data);
 	}
 
-	public function account($action = '')
+	public function registration()
+	{
+		$this->load->view('frontend/home/register');
+	}
+
+	public function register($action = '')
 	{
 		if($this->input->post()) {
 			$this->form_validation->set_rules('email', 'Email', 'required|is_unique['.TABLE_CUSTOMERS.'.email]');
 			if($this->form_validation->run() == FALSE) {
-				$data['action'] = '';
-				$this->load->view('frontend/cart/account', $data);
+				$this->load->view('frontend/home/register');
 				return;
 			} else {
 				$data = $this->input->post();
@@ -123,25 +127,12 @@ class Home extends CI_Controller {
 				$data['status'] = 1;
 				$data['password'] = md5($data['password']);
 				if($insert_id = save(TABLE_CUSTOMERS, $data)) {
-					if($action = 'checkout') {
-						$customer_id = customer_login($data['email'], $data['password']);
-						$data['contact_person'] = $data['name'];
-						$data['delivery_option'] = 'address';
-						$this->session->set_userdata($data);
-						$this->load->library('cart');
-						$data['total'] = $this->cart->total();
-						$data['cart'] = $this->cart->contents();
-						$data['type'] = 'loggedin';
-						$this->load->view('frontend/cart/payment', $data);
-						return;
-					}
+					$this->session->set_userdata('message', '<h1 style="color:blue">Your account has been succesfully created. Kindly Login with your details below.</h1>');
+					redirect('cart-checkout');
 				}
 			}
 		} else {
-			if($action == 'checkout') {
-				$data['action'] = 'checkout';
-				$this->load->view('frontend/cart/account', $data);
-			}
+			redirect('shop');
 		}
 	}
 

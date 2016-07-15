@@ -29,8 +29,12 @@
               </form>
               <br /><br />
               <hr /><br />
-
-              <h1>Or Login Below.</h1>
+              <?php if($this->session->userdata('message') == ''){
+                echo '<h1>Or Login Below.</h1>';
+              } else {
+                echo $this->session->userdata('message');
+                $this->session->set_userdata('message', '');
+              } ?>
                 <form class="" action="<?=site_url('checkout/login') ?>" method="post">
                     <p><?php echo validation_errors(); echo $this->session->userdata('error'); ?></p>
                     <input type="text" name="email" size="14" value="" class="" id="" placeholder="user@domain.com"/><br /><br/>
@@ -38,7 +42,7 @@
                     <input type="submit" value="Continue" class="btn" onclick="#" onmouseover="this.className='btn_over'" onmouseout="this.className='btn'">
                 </form>
 
-                <p>Dont have an account with us? <a href="<?=site_url('account/checkout') ?>">Register here</a></p>
+                <p>Dont have an account with us? <a href="<?=site_url('registration') ?>">Register here</a></p>
                 <?php } ?>
           </div>
         </div>
