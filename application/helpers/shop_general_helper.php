@@ -56,8 +56,11 @@
 				$sub_categories = get(TABLE_SUB_CATEGORIES, 'id', 'ASC','','', $where=array('category_id'=>$row->id, 'status'=>1));
 				$html.='<li><a href="'.$url.'" class="cat">'.strtoupper($row->name).'</a>';
 				$html.='<ul class="subMenu">';
-				foreach($sub_categories as $inner_row)
-					$html.='<li><a href="#" class="subcat">'.strtoupper($inner_row->name).'</a></li>';
+				foreach($sub_categories as $inner_row) {
+					$sub_url = site_url('subcategory/'.$inner_row->slug);
+					$html.='<li><a href="'.$sub_url.'" class="subcat">'.strtoupper($inner_row->name).'</a></li>';
+				}
+
 				$html.='</ul></li>';
 			} else {
 				$html.='<li><a href="'.$url.'" class="cat">'.strtoupper($row->name).'</a></li>';
@@ -174,5 +177,34 @@
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
+		return true;
+	}
+
+	function send_mail()
+	{
+		$CI = & get_instance();
+		$config = Array(
+				'protocol' => 'smtp',
+        'smtp_host' => 'ssl://smtp.googlemail.com',
+        'smtp_port' => 465,
+        'smtp_user' => 'user@gmail.com',
+        'smtp_pass' => '',
+        'mailtype'  => 'html',
+        'charset' => 'utf-8',
+        'wordwrap' => TRUE
+
+    );
+    $CI->load->library('email', $config);
+    $CI->email->set_newline("\r\n");
+    $email_body ="<div>hello world</div>";
+    $CI->email->from('user@gmail.com', 'ddd');
+
+    $list = array('user@gmail.com');
+    $CI->email->to($list);
+    $CI->email->subject('Testing Email');
+    $CI->email->message($email_body);
+
+    $CI->email->send();
+    //echo $this->email->print_debugger();
 		return true;
 	}

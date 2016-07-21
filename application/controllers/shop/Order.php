@@ -264,7 +264,7 @@ class Order extends CI_Controller {
 		$data['cash_envoy_transaction_description'] = 'Puchase of Groceries Items from Wetindey Online Shop';
 		// notify url - absolute url of the page to which the user should be directed after payment
 		// an example of the code needed in this type of page can be found in example_requery_usage.php
-		$data['cash_envoy_notify_url'] = 'http://www.wetindey.com.ng/shop/order/paymentcomplete/'.$order->order_number;
+		$data['cash_envoy_notify_url'] = 'http://www.wetindey.com.ng/shop/order/feedback/'.$order->order_number;
 		//Generate request signature
 		$con = $key.$data['cash_envoy_transction_reference'].$data['cash_envoy_amount'];
 		$data['signature'] = hash_hmac('sha256', $con, $key, false);
@@ -319,7 +319,7 @@ class Order extends CI_Controller {
 	}
 
   // what gets invoked after an api call.
-	public function paymentcomplete($order_number = '')
+	public function feedback($order_number = '')
 	{
 		$this->__clearcache();
 		$order = get_row(TABLE_ORDERS, array('order_number'=>$order_number));
@@ -333,27 +333,39 @@ class Order extends CI_Controller {
 			$save['returned_amount'] = $response[2];
 			$this->orders_model->save_returned_payment_data($save);
 			//var_dump($response);
-			$this->complete();
+			switch($response[1]){
+				case 'C00':
+					redirect('status/complete');
+				break;
+				case 'C01':
+					redirect('status/payment-cancelled');
+				break;
+				case 'C02':
+					redirect('status/inactivity');
+				break;
+				case 'C03':
+					redirect('status/no-transaction');
+				break;
+				case 'C04':
+					redirect('status/insufficient');
+				break;
+				case 'C05':
+					redirect('status/transaction-failed');
+				break;
+
+				default:
+					redirect('status/error');
+				break;
+			}
 		} else {
 			$save['error_string'] = $response[0];
 			$this->orders_model->save_returned_payment_data($save);
 			$this->payment_gateway_error();
 			$this->__clearcache();
+		 redirect('status/error');
 		}
 	}
 
-	//After pay on delivery or succesfull online payment.
-	public function complete()
-	{
-		redirect('thank-you', 'refresh');
-	}
-
-	public function payment_gateway_error()
-	{
-		$this->cart->destroy();
-		$this->__clearcache();
-		$this->load->view('frontend/cart/payment_gateway_error');
-	}
 
 
  // If Cancel and order option at checkout.

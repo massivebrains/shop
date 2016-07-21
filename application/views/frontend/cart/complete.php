@@ -8,12 +8,13 @@
      <div id="mainContent"><section id="extrapage">
       <div class="breadcrumbs">
         <a href='index.html'>Home</a> > 
-        <a href='#'>Thank You!</a>
+        <a href='#'>Order Status</a>
       </div>
-      <h1 class="page_headers">Thank You!</h1>
+      <h1 class="page_headers"><?=$header ?></h1>
 
       <div class="content">
-        <P>Your order has been placed succesfully. Return to the <a href="<?=site_url('shop/home') ?>">Home Page</a>.
+        <p><?=$text ?></p>.
+        <p><a href="<?php echo site_url('shop') ?>">Return to Home page.</a></p>
         </div>
         <div class="clear"></div>
       </section>

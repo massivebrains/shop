@@ -100,6 +100,51 @@ class Home extends CI_Controller {
 		$this->load->view('frontend/home/single_category', $data);
 	}
 
+	public function subcategory($slug = '')
+	{
+		$subcategory = get_row(TABLE_SUB_CATEGORIES, $where=array('slug'=>$slug));
+		$count = num_rows(TABLE_PRODUCTS, array('subcategory_id'=>$subcategory->id));
+		$this->load->library('pagination');
+		$config['base_url'] = site_url('category/'.$slug);
+		$config['total_rows'] = $count;
+		$config['per_page'] = 28;
+		$config["uri_segment"] = 5;
+		$config['first_link'] = 'First';
+		$config['first_tag_open'] = '<li>';
+		$config['first_tag_close'] = '</li>';
+		$config['last_link'] = 'Last';
+		$config['last_tag_open'] = '<li>';
+		$config['last_tag_close'] = '</li>';
+
+		$config['full_tag_open'] = '<ul class="pagination hor-list">';
+		$config['full_tag_close'] = '</ul>';
+		$config['cur_tag_open'] = '<li class="active"><a>';
+		$config['cur_tag_close'] = '</a></li>';
+
+		$config['num_tag_open'] = '<li>';
+		$config['num_tag_close'] = '</li>';
+
+		$config['prev_link'] = 'previous';
+		$config['prev_tag_open'] = '<li>';
+		$config['prev_tag_close'] = '</li>';
+
+		$config['next_link'] = 'next';
+		$config['next_tag_open'] = '<li>';
+		$config['next_tag_close'] = '</li>';
+
+		$this->pagination->initialize($config);
+		$page = ($this->uri->segment(5)) ? $this->uri->segment(5) : 0;
+		$data['pagination'] = $this->pagination->create_links();
+		$data['products'] = get(TABLE_PRODUCTS, 'id', 'RANDOM', $config['per_page'], $page, array('status'=>1, 'subcategory_id'=>$subcategory->id));
+		$data['new_products'] = get(TABLE_PRODUCTS, 'id', 'DESC', 5, 0, array('status'=>1));
+		$this->session->set_userdata('title',$slug);
+		$data['name'] = $subcategory->name;
+		$data['count'] = $count;
+		//$this->output->enable_profiler(TRUE);
+		$this->load->view('frontend/home/single_category', $data);
+	}
+
+
 	public function product($product_sku = '')
 	{
 		$data['product'] = get_row(TABLE_PRODUCTS, array('sku'=>$product_sku));
@@ -166,7 +211,7 @@ class Home extends CI_Controller {
 		redirect('shop');
 	}
 
-	public function thank_you()
+	public function status($status = '')
 	{
 		$this->load->library('cart');
 		foreach($this->cart->contents() as $row)
@@ -176,7 +221,51 @@ class Home extends CI_Controller {
 		}
 		$this->cart->destroy();
 		$this->session->sess_destroy();
-		$this->load->view('frontend/cart/complete');
+		switch($status) {
+
+			case 'complete':
+				$data['header'] = 'Thank You';
+				$data['text'] = 'Your order  has been placed succesfully. we will get back to you soon.';
+			break;
+
+			case 'payment-cancelled':
+				$data['header'] = 'Payment Cancelled';
+				$data['text'] = 'You have succesfully cancelled your order.';
+			break;
+
+			case 'inactivity':
+				$data['header'] = 'Inactivity';
+				$data['text'] = 'Your order has been cancelled due to inactivity.';
+			break;
+
+			case 'no-transaction':
+				$data['header'] = 'No transaction occured';
+				$data['text'] = 'No transaction occured.';
+			break;
+
+			case 'insufficient':
+				$data['header'] = 'Insufficient funds';
+				$data['text'] = 'Insufficient funds.';
+			break;
+
+			case 'transaction-failed':
+				$data['header'] = 'Transaction Failed';
+				$data['text'] = 'Transaction failed. Contact support@cashenvoy.com for more information';
+			break;
+
+			case 'error':
+				$data['header'] = 'Error';
+				$data['text'] = 'We were not able to complete the request. an unexpected error has occured.';
+			break;
+		}
+		$this->load->view('frontend/cart/complete', $data);
+	}
+
+  public function gateway_error()
+	{
+		$this->cart->destroy();
+		$this->__clearcache();
+		$this->load->view('frontend/cart/payment_gateway_error');
 	}
 
 

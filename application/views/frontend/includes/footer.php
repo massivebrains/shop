@@ -21,8 +21,11 @@
           <!--END: FRAME_LINKS--></div>
       </div>
       <div class="text-block">
-      		<h3>Text Block</h3>
-            <p>This is some text for your store, sed rutrum metus condimentum sodales. Fusce quis tellus mollis sapien porta placerat. In dapibus velit eget felis.</p>
+      		<h3>About</h3>
+            <p>
+              Wetin dey® is a branded convenience store fulfilling a need that will continue to exist into the future. At Wetin dey, we’re happy to help you with any of your shopping needs. We sell the same products as other convenience stores in the same packaging sizes, quality, and quantity. This includes groceries, personal care items, household items, beverages (soft drinks, fruit juices, etc.), hot and cold snacks, etc.
+              Don’t forget to check out our stores. Thank you for choosing Wetin dey Stores and hope to see you soon!
+            </p>
       </div>
       <div class="newsletter">
       <!--START: FRAME_MAILLIST-->

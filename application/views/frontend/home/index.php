@@ -26,8 +26,9 @@
 							<div id="homeCarousel" class="flexslider">
 								<ul class="slides">
 									<!--START: carousel-->
-									<li><a href="#"><img src="<?=base_url() ?>assets/frontend/images/slide1.png" alt="" /></a></li>
-									<li><a href="#"><img src="<?=base_url() ?>assets/frontend/images/slide1.png" alt="" /></a></li>
+									<?php for($i = 1; $i<=5; $i++): ?>
+									<li><a href="#"><img src="<?=base_url() ?>assets/frontend/images/slide<?=$i ?>.png" alt="" /></a></li>
+								<?php endfor ?>
 
 									<!--END: carousel-->
 								</ul>
@@ -112,9 +113,9 @@
 
 
 
-			<?php $this->load->view('frontend/includes/aside') ?>
+
 			<div class="clear"></div>
-			<?php// $this->load->view('frontend/cart/aside') ?>
+
 		</div>
 		<?php $this->load->view('frontend/includes/footer') ?>
 	</div>
