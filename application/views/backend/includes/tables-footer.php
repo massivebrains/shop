@@ -28,8 +28,6 @@
 <script src="<?=base_url() ?>assets/backend/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="<?=base_url() ?>assets/backend/assets/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
 <script src="<?=base_url() ?>assets/backend/assets/plugins/toastr/toastr.min.js"></script>
-<script src="<?=base_url() ?>assets/backend/assets/js/tactic/play.js"></script>
-<script src="<?=base_url() ?>assets/backend/assets/js/tactic/game.js"></script>
 <script src="<?=base_url() ?>assets/backend/pages/js/pages.min.js"></script>
 <script src="<?=base_url() ?>assets/backend/assets/js/datatables.js" type="text/javascript"></script>
 <script src="<?=base_url() ?>assets/backend/assets/js/scripts.js" type="text/javascript"></script>

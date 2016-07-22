@@ -107,8 +107,8 @@ class Order extends CI_Controller {
 			case 'pay_on_delivery':
 				$order_total = $this->input->post('order_total');
 				unset($data['pay_on_delivery']);
-				if($order_id = $this->save_order($order_total))
-					redirect('order-complete');
+				if($order_id = $this->save_order($order_total, 'pay_on_delivery'))
+					redirect('status/complete');
 				else
 					redirect('shop');
 			break;
@@ -116,7 +116,7 @@ class Order extends CI_Controller {
 			case 'pay_online':
 				$order_total = $this->input->post('order_total');
 				unset($data['pay_online']);
-				if($order_id = $this->save_order($order_total))
+				if($order_id = $this->save_order($order_total, 'online'))
 					$this->payment_gateway($order_id);
 				else
 					redirect('shop');
@@ -184,7 +184,7 @@ class Order extends CI_Controller {
 		}
 	}
 
-	public function save_order($order_total = 0)
+	public function save_order($order_total = 0, $payment_method = '')
 	{
 		$_cart = $this->cart->contents();
 		$i = 0;
@@ -221,6 +221,7 @@ class Order extends CI_Controller {
 			$data['customer_id'] = 0;
 		}
 
+		$data['payment_method'] = $payment_method;
 		$data['status'] = 'pending';
 		$order_id = save(TABLE_ORDERS, $data);
 		$this->session->set_userdata('order_id', $order_id);
@@ -338,22 +339,28 @@ class Order extends CI_Controller {
 					redirect('status/complete');
 				break;
 				case 'C01':
+				  delete_order($order->id);
 					redirect('status/payment-cancelled');
 				break;
 				case 'C02':
+					delete_order($order->id);
 					redirect('status/inactivity');
 				break;
 				case 'C03':
+					delete_order($order->id);
 					redirect('status/no-transaction');
 				break;
 				case 'C04':
+					delete_order($order->id);
 					redirect('status/insufficient');
 				break;
 				case 'C05':
+					delete_order($order->id);
 					redirect('status/transaction-failed');
 				break;
 
 				default:
+					delete_order($order->id);
 					redirect('status/error');
 				break;
 			}

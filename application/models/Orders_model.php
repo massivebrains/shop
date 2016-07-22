@@ -36,6 +36,7 @@ public function get_array($where = array())
 	'.TABLE_ORDERS.'.status,
 	'.TABLE_ORDERS.'.customer_type,
 	'.TABLE_ORDERS.'.customer_id,
+	'.TABLE_ORDERS.'.payment_method,
 	');
 	$query = $this->db->order_by('id', 'DESC');
 	$query = $this->db->get(TABLE_ORDERS);
@@ -51,10 +52,5 @@ public function get_order($where = array())
 	return $query->row();
 }
 
-public function save_returned_payment_data($data = array())
-{
-		$this->db->insert(TABLE_ORDERS_TRANSACTIONS_LOG, $data);
-    return true;
-}
 
 }

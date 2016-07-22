@@ -180,6 +180,17 @@
 		return true;
 	}
 
+	function order_is_completed($order_id)
+	{
+		//$table='', $where=array(), $cell=''
+		if(get_cell(TABLE_ORDERS, array('id'=>$order_id), 'status') == 'completed') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
 	function send_mail()
 	{
 		$CI = & get_instance();

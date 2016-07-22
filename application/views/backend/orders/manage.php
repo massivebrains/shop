@@ -54,11 +54,12 @@
                               <td>DATE</td>
                               <td>ORDER NUMBER</td>
   														<td>CUSTOMER NAME</td>
+															<td>DELIVERY ADDRESS</td>
   														<td>DELIVERY OPTION</td>
-  														<td>DELIVERY ADDRESS</td>
   														<td>ORDER STATUS</td>
   														<td>ORDER TOTAL</td>
   														<td>DELIVERY STATUS</td>
+  														<td>PAYMENT METHOD</td>
   														<td>ACTION</td>
 														</tr>
 													</thead>

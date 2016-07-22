@@ -30,6 +30,5 @@
 <script src="<?=base_url() ?>assets/backend/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="<?=base_url() ?>assets/backend/pages/js/pages.min.js"></script>
 <script src="<?=base_url() ?>assets/backend/assets/plugins/toastr/toastr.min.js"></script>
-<script src="<?=base_url() ?>assets/backend/assets/js/dashboard.js" type="text/javascript"></script>
 <script src="<?=base_url() ?>assets/backend/assets/js/scripts.js" type="text/javascript"></script>
 <script src="<?=base_url() ?>assets/backend/assets/js/demo.js" type="text/javascript"></script>

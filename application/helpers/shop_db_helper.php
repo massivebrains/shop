@@ -190,3 +190,14 @@ function customer_name($type = '', $id = '')
 		return strtoupper($customer->name);
 	}
 }
+
+function delete_order($order_id = '')
+{
+	$where = array('id'=>$order_id);
+	delete(TABLE_ORDERS, $where);
+	$where = array('order_id'=>$order_id);
+	delete(TABLE_ORDER_DELIVERY_DETAILS, $where);
+	delete(TABLE_ORDERS_TRANSACTIONS_LOG, $where);
+	logActivity('Order Deleted. [ID:'.$order_id.']');
+	return true;
+}

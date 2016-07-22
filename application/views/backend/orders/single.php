@@ -129,7 +129,8 @@
 
                     <div class="form-group">
                       <label>Delivery Option</label>
-                      <input type="text" name="name" class="form-control" id="name" value="<?=$order->delivery_option ?>" disabled>
+                      <?php $delivery_option = $order->delivery_option == 'pick_up' ? 'Pick Up' : 'Deliver to Address' ?>
+                      <input type="text" name="name" class="form-control" id="name" value="<?=$delivery_option ?>" disabled>
                     </div>
 
                     <div class="form-group">
@@ -160,11 +161,29 @@
                     </div>
 
                     <div class="form-group">
-                      <a class="btn btn-warning btn-sm" href="#" onclick="return confirm('Are you sure');"><i class="fa fa-check-square-o"></i> Mark As Delivered</a>&nbsp;
-                      <a class="btn btn-success btn-sm" href="#" onclick="return confirm('Are you sure');"><i class="fa fa-check"></i> Mark As Completed</a>&nbsp;
-                      <a class="btn btn-primary btn-sm" href="#" onclick="return confirm('Are you sure');"><i class="fa fa-external-link-square"></i> Verify Payment</a>&nbsp;
-                      <a class="btn btn-danger btn-sm" href="<?=site_url('backend/orders/delete/'.$order->id) ?>" onclick="return confirm('Are you sure');"><i class="fa fa-calendar-times-o"></i> Delete</a>
+                      <?php if(order_is_completed($order->id)){ ?>
+                        <a class="btn btn-warning btn-sm" href="<?=site_url('backend/orders/unmark_order_as_completed/'.$order->id) ?>" onclick="return confirm('Are you sure');" class="tooltip-test" data-toggle="tooltip"
+                         title="If this order is unmarked delivered, it is understood that payment has been reversed but order is still valid.">
+                          <i class="fa fa-check"></i> Unmark As Delivered
+                        </a>&nbsp;
+                      <?php }else{ ?>
+                      <a class="btn btn-success btn-sm" href="<?=site_url('backend/orders/mark_order_as_completed/'.$order->id) ?>" onclick="return confirm('Are you sure');" class="tooltip-test" data-toggle="tooltip"
+                       title="If this order is marked delivered, it is understood that payment has been confirmed either manually or online.">
+                        <i class="fa fa-check"></i> Mark As Delivered
+                      </a>&nbsp;
+                      <?php } ?>
+                      <?php if($order->payment_method == 'online'): ?>
+                      <a class="btn btn-primary btn-sm" href="<?php echo site_url('backend/orders/verify_payment/'.$order->id) ?>" onclick="return confirm('Are you sure');" class="tooltip-test" data-toggle="tooltip"
+                       title="Use this button to requery the payment gateway and confirm if payment was both successful and was <?=currency($order->order_total) ?>">
+                       <i class="fa fa-external-link-square"></i> Verify Payment
+                     </a>&nbsp;
+                   <?php endif; ?>
+                      <a class="btn btn-danger btn-sm" href="<?=site_url('backend/orders/delete/'.$order->id) ?>" onclick="return confirm('Are you sure');" class="tooltip-test" data-toggle="tooltip"
+                       title="By deleting this order, the system deletes any transaction associated with it and assumes it never existed.">
+                       <i class="fa fa-calendar-times-o"></i> Delete
+                     </a>
                     </div>
+
 
 
 
