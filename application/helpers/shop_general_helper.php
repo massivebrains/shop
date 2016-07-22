@@ -191,31 +191,28 @@
 	}
 
 
-	function send_mail()
+	function send_order_mail($order_id = 0)
 	{
 		$CI = & get_instance();
-		$config = Array(
-				'protocol' => 'smtp',
-        'smtp_host' => 'ssl://smtp.googlemail.com',
-        'smtp_port' => 465,
-        'smtp_user' => 'user@gmail.com',
-        'smtp_pass' => '',
-        'mailtype'  => 'html',
-        'charset' => 'utf-8',
-        'wordwrap' => TRUE
+		$data['order'] = get_row(TABLE_ORDERS, array('id'=>$order_id));
+				$config = Array(
+						'protocol' => 'smtp',
+		        'smtp_host' => 'mail.wetindey.com.ng',
+		        'smtp_port' => 25,
+		        'smtp_user' => 'orders@wetindey.com.ng',
+		        'smtp_pass' => 'cynosure',
+		        'mailtype'  => 'html',
+		        'charset' => 'utf-8',
+		        'wordwrap' => TRUE
 
-    );
+		    );
     $CI->load->library('email', $config);
     $CI->email->set_newline("\r\n");
-    $email_body ="<div>hello world</div>";
-    $CI->email->from('user@gmail.com', 'ddd');
-
-    $list = array('user@gmail.com');
-    $CI->email->to($list);
-    $CI->email->subject('Testing Email');
-    $CI->email->message($email_body);
-
+    $CI->email->from('orders@wetindey.com.ng', 'WETIN DEY ONLINE STORE');
+    $CI->email->to('vadeshayo@gmail.com');
+    $CI->email->subject('New Order Notification');
+    $body = $CI->load->view('emails/order.php', $data,TRUE);
+    $CI->email->message($body);
     $CI->email->send();
-    //echo $this->email->print_debugger();
 		return true;
-	}
+    }

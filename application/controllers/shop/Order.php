@@ -107,10 +107,13 @@ class Order extends CI_Controller {
 			case 'pay_on_delivery':
 				$order_total = $this->input->post('order_total');
 				unset($data['pay_on_delivery']);
-				if($order_id = $this->save_order($order_total, 'pay_on_delivery'))
+				if($order_id = $this->save_order($order_total, 'pay_on_delivery')){
+					send_order_mail($order_id);
 					redirect('status/complete');
-				else
+				} else {
 					redirect('shop');
+				}
+
 			break;
 
 			case 'pay_online':
@@ -336,6 +339,7 @@ class Order extends CI_Controller {
 			//var_dump($response);
 			switch($response[1]){
 				case 'C00':
+					send_order_mail($order->id);
 					redirect('status/complete');
 				break;
 				case 'C01':
