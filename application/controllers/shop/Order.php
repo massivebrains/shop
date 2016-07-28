@@ -97,7 +97,7 @@ class Order extends CI_Controller {
 				$this->load->view('frontend/cart/details');
 			break;
 
-			case 'guest_details':
+			case 'details':
 				$this->session->set_userdata($data);
 				$data['total'] = $this->cart->total();
 				$data['cart'] = $this->cart->contents();
@@ -130,14 +130,14 @@ class Order extends CI_Controller {
 					redirect('checkout/customer_is_logged_in');
 				$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 				if ($this->form_validation->run() == FALSE) {
-					$this->load->view('frontend/cart/checkout');
+					//$this->load->view('frontend/cart/checkout');
+					$this->load->view('frontend/cart/payment', $data);
 				} else {
 					$email = $this->input->post('email');
 					$password = $this->input->post('password');
 					$customer_id = customer_login($email, $password);
-					if((int)$customer_id != 0) {
+					if($customer_id != 0) {
 						$_data = get_row(TABLE_CUSTOMERS, array('id'=>$customer_id));
-						$data['delivery_option'] = 'address';
 						$data['address'] = $_data->address;
 						$data['city'] = $_data->city;
 						$data['area'] = $_data->area;
@@ -148,10 +148,9 @@ class Order extends CI_Controller {
 						$this->session->set_userdata($data);
 
 						$data['total'] = $this->cart->total();
-
 						$data['cart'] = $this->cart->contents();
 
-						$this->load->view('frontend/cart/payment', $data);
+						$this->load->view('frontend/cart/details', $data);
 					} else {
 						$this->session->set_userdata('error','Wrong email or password.');
 						$this->checkout();
@@ -163,7 +162,6 @@ class Order extends CI_Controller {
 				$_data = get_row(TABLE_CUSTOMERS, array('id'=>$this->session->userdata('customer_id')));
 				if(!$_data)
 					redirect('shop');
-				$data['delivery_option'] = 'address';
 				$data['address'] = $_data->address;
 				$data['city'] = $_data->city;
 				$data['area'] = $_data->area;
@@ -173,7 +171,7 @@ class Order extends CI_Controller {
 				$this->session->set_userdata($data);
 				$data['total'] = $this->cart->total();
 				$data['cart'] = $this->cart->contents();
-				$this->load->view('frontend/cart/payment', $data);
+				$this->load->view('frontend/cart/details', $data);
 			break;
 
 			case 'cancel_order':
@@ -225,6 +223,7 @@ class Order extends CI_Controller {
 		}
 
 		$data['payment_method'] = $payment_method;
+		$data['delivery_charge'] = $this->session->userdata('delivery_charge');
 		$data['status'] = 'pending';
 		$order_id = save(TABLE_ORDERS, $data);
 		$this->session->set_userdata('order_id', $order_id);
@@ -232,6 +231,7 @@ class Order extends CI_Controller {
 
 		$data['order_id'] = $order_id;
 		$data['delivery_option'] = $this->session->userdata('delivery_option');
+		$data['pickup_station'] = $this->session->userdata('pickup_station');
 		$data['address'] = $this->session->userdata('address');
 		$data['city'] = $this->session->userdata('city');
 		$data['area'] = $this->session->userdata('area');
@@ -257,7 +257,8 @@ class Order extends CI_Controller {
 		//Transaction reference which must not contain any special characters. Numbers and alphabets only.
 		$data['cash_envoy_transction_reference'] = $order->order_number;
 		//Transaction Amount
-		$data['cash_envoy_amount'] = $order->order_total;
+		$charge = ((2.5/100) * $order->order_total) + 12.60;
+		$data['cash_envoy_amount'] = $charge + $order->order_total;
 		//Customer ID
 		if($order->customer_type == 'guest') {
 			$data['cash_envoy_customer_id'] = $order->guest_email;
@@ -268,7 +269,7 @@ class Order extends CI_Controller {
 		$data['cash_envoy_transaction_description'] = 'Puchase of Groceries Items from Wetindey Online Shop';
 		// notify url - absolute url of the page to which the user should be directed after payment
 		// an example of the code needed in this type of page can be found in example_requery_usage.php
-		$data['cash_envoy_notify_url'] = 'http://www.wetindey.com.ng/shop/order/feedback/'.$order->order_number;
+		$data['cash_envoy_notify_url'] = 'http://www.wetindey.com.ng/ng/shop/order/feedback/'.$order->order_number;
 		//Generate request signature
 		$con = $key.$data['cash_envoy_transction_reference'].$data['cash_envoy_amount'];
 		$data['signature'] = hash_hmac('sha256', $con, $key, false);
@@ -280,7 +281,7 @@ class Order extends CI_Controller {
 	//Gets a payment status from the payment gateway api.
 	public function getStatus($transref, $mertid, $type='', $sign){
 		$request = 'mertid='.$mertid.'&transref='.$transref.'&respformat='.$type.'&signature='.$sign; //initialize the request variables
-		$url = 'https://www.cashenvoy.com/sandbox/?cmd=requery'; //this is the url of the gateway's test api
+		$url = 'https://www.cashenvoy.com/webservice/?cmd=requery'; //this is the url of the gateway's test api
 		//$url = 'https://www.cashenvoy.com/webservice/?cmd=requery'; //this is the url of the gateway's live api
 		$ch = curl_init(); //initialize curl handle
 		curl_setopt($ch, CURLOPT_URL, $url); //set the url
@@ -335,11 +336,12 @@ class Order extends CI_Controller {
 			$save['returned_transactionref'] = $response[0];
 			$save['returned_status'] = $response[1];
 			$save['returned_amount'] = $response[2];
-			$this->orders_model->save_returned_payment_data($save);
+			save(TABLE_ORDERS_TRANSACTIONS_LOG, $save);
 			//var_dump($response);
 			switch($response[1]){
 				case 'C00':
 					send_order_mail($order->id);
+					send_order_mail_to_customer($order->id);
 					redirect('status/complete');
 				break;
 				case 'C01':

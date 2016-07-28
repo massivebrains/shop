@@ -27,3 +27,4 @@ define('TABLE_ORDERS','tblorders');
 define('TABLE_ORDER_DELIVERY_DETAILS','tblorderdeliverydetails');
 define('TABLE_CUSTOMERS','tblcustomers');
 define('TABLE_ORDERS_TRANSACTIONS_LOG','tblordertransactionslog');
+define('TABLE_PICKUP_STATIONS','tblpickupstations');

@@ -133,6 +133,7 @@
                       <input type="text" name="name" class="form-control" id="name" value="<?=$delivery_option ?>" disabled>
                     </div>
 
+                    <?php if($order->delivery_option == 'address'){ ?>
                     <div class="form-group">
                       <label>Delivery Address</label>
                       <div class="alert">
@@ -142,6 +143,18 @@
                       </div>
 
                     </div>
+                    <?php }else{ ?>
+                      <div class="form-group">
+                      <label>Pickp Station Selected</label>
+                      <div class="alert">
+                      <?php if($pickup_station = get_row(TABLE_PICKUP_STATIONS, array('id'=>$order->pickup_station))): ?>
+                        <span><?=$pickup_station->name ?></span><br/>
+                        <address><?=$pickup_station->address ?></address>
+                        <?php endif; ?>
+                      </div>
+
+                    </div>
+                    <?php } ?>
 
 
 

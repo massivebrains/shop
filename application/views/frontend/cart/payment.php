@@ -24,7 +24,6 @@
                           <p>
                             <?=$this->session->userdata('delivery_option') ?>
                             <?php if(customer_is_logged_in()): ?>
-                            <a href="#"> (change)</a>
                           <?php endif ?>
                           </p>
                         </td>
@@ -63,7 +62,7 @@
               </table><br />
 
               <h1 class="page_headers">Order Summary</h1>
-              <?php $charges_table = build_charges_table($total) ?>
+              <?php $charges_table = build_charges_table($total, $this->session->userdata('delivery_option')) ?>
               <?=$charges_table['html'] ?>
               <br>
               <img src="<?php echo base_url() ?>assets/frontend/payment_options.PNG" alt="Payement Options" />
@@ -71,10 +70,10 @@
                   <input type="hidden" name="order_total" value="<?=$charges_table['total'] ?>">
                   <button type="submit" name="submit" style="font-size:20px;" style="font-size:20px; margin-right:10px;">Pay Online</button>
                 </form>
-              <form class="" action="<?=site_url('checkout/pay_on_delivery') ?>" method="post">
-                <input type="hidden" name="order_total" value="<?=$charges_table['total'] ?>">
+              <!-- <form class="" action="<?php //echo site_url('checkout/pay_on_delivery') ?>" method="post">
+                <input type="hidden" name="order_total" value="<?php //echo $charges_table['total'] ?>">
                 <button type="submit" name="submit" style="font-size:20px;">Pay on Delivery</button>
-              </form>
+              </form> -->
               <form class="" action="<?=site_url('checkout/cancel_order') ?>" method="post">
                 <button type="submit" name="submit" style="font-size:20px;">Cancel Order</button>
               </form>

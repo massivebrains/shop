@@ -32,7 +32,6 @@ class Orders extends CI_Controller {
 			$new[$i]['date'] = $orders[$i]['date'];
 			$new[$i]['order_number'] = $orders[$i]['order_number'];
 			$new[$i]['customer_name'] = customer_name($orders[$i]['customer_type'], $orders[$i]['customer_id']);
-			$new[$i]['delivery_address'] = $orders[$i]['address'];
 			$new[$i]['delivery_option'] = ($orders[$i]['delivery_option'] == 'pick_up' ? 'Pick Up' : 'Address');
 			$new[$i]['order_status'] = $orders[$i]['status'];
 			$new[$i]['order_total'] = $orders[$i]['order_total'];
@@ -117,6 +116,7 @@ class Orders extends CI_Controller {
 	public function verify_payment($order_id = 0)
 	{
 		$order = get_row(TABLE_ORDERS, array('id'=>$order_id));
+		var_dump($order);
 		$key = CASH_ENVOY_MERCHANT_KEY;
 		$transref = $order->order_number;
 		$mertid = CASH_ENVOY_MERCHANT_ID;
@@ -135,7 +135,6 @@ class Orders extends CI_Controller {
 		}
 		$this->session->set_flashdata('success', $result);
 		$this->order($order->id);
-
 	}
 
 }

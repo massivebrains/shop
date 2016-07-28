@@ -41,6 +41,10 @@
                              <a href="<?=site_url('backend/suppliers') ?>">Suppliers</a>
                             <span class="icon-thumbnail">SU</span>
                         </li>
+                        <li>
+                             <a href="<?=site_url('backend/pickup_stations') ?>">Pickup Stations</a>
+                            <span class="icon-thumbnail">PS</span>
+                        </li>
 
                     </ul>
                 </li>

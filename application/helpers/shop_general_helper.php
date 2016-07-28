@@ -1,4 +1,4 @@
-	<?php
+<?php
 	function admin_url()
 	{
 		return site_url('backend/index');
@@ -80,139 +80,193 @@
 			return false;
 	}
 
-	// <table class="table">
-	// 		<tr>
-	// 			<td><strong>Total</strong></td>
-	// 			<td><strong></strong></td>
-	// 		</tr>
-	// 		<tr>
-	// 			<td><strong>Delivery Charge</strong></td>
-	// 			<td><strong></strong></td>
-	// 		</tr>
-	//
-	// </table>
-	function build_charges_table($order_total)
+	function delivery_charge($order_total = 0)
+	{
+		$charge = 133000;
+
+		if($order_total >= 10000) {
+			$charge = 0;
+		}else if($order_total >= 5000 && $order_total < 10000) {
+			$charge = 300;
+		}else if($order_total < 5000) {
+			$charge = 500;
+		}else {
+			$charge = 10000;
+		}
+		return $charge;
+	}
+
+
+
+	function build_charges_table($order_total, $delivery_option = '')
 	{
 		$CI = & get_instance();
+
 		$html = '
-			<table class="table">
-					<tr>
-						<td><strong>Total</strong></td>
-						<td><strong>'.currency($order_total).'</strong></td>
-					</tr>
-		';
-		$charges = $CI->db->get_where(TABLE_CHARGES, array('status'=>1));
-		if($charges->num_rows() < 1) {
-			$html.='
-					<tr>
-						<td><strong>Grand Total:</strong></td>
-						<td><strong>'.currency($order_total).'</strong></td>;
-
-					</tr>
+		<table class="table">
+			<tr>
+				<td><strong>Total</strong></td>
+				<td><strong>'.currency($order_total).'</strong></td>
+			</tr>
 			';
-			$html.='</table>';
-			$data = array('html'=>$html, 'total'=>$order_total);
-			return $data;
-		}
 
-		foreach($charges->result() as $row) {
-			if($row->type == 'credit') {
-				$order_total+=$row->value;
+			$_delivery_charge = delivery_charge($order_total);
+			$CI->session->set_userdata('delivery_charge', $_delivery_charge);
+			if($_delivery_charge > 0 && $delivery_option =='address') {
+				$order_total+=$_delivery_charge;
 				$html.='
+				<tr>
+					<td><strong style="color:green;">Delivery Charge</strong></td>
+					<td><strong style="color:green;">'.currency($_delivery_charge).'</strong></td>
+				</tr>
+				';
+			}
+
+			$charges = $CI->db->get_where(TABLE_CHARGES, array('status'=>1));
+			if($charges->num_rows() < 1) {
+				$html.='
+				<tr>
+					<td><strong>Grand Total:</strong></td>
+					<td><strong>'.currency($order_total).'</strong></td>
+
+				</tr>
+				';
+				$html.='</table>';
+				$data = array('html'=>$html, 'total'=>$order_total);
+				return $data;
+			}
+
+			foreach($charges->result() as $row) {
+				if($row->type == 'credit') {
+					$order_total+=$row->value;
+					$html.='
 					<tr>
 						<td><strong style="color:red;">'.$row->name.'</strong></td>
 						<td><strong style="color:red;">'.currency($row->value).'</strong></td>
 					</tr>
-				';
-			} else {
-				$order_total-=$row->value;
-				$html.='
+					';
+				} else {
+					$order_total-=$row->value;
+					$html.='
 					<tr>
 						<td><strong style="color:green;">'.$row->name.'</strong></td>
 						<td><strong style="color:green;">'.currency($row->value).'</strong></td>
 					</tr>
-				';
-			}
+					';
+				}
 
 			}
+
+
 			$html.='
-					<tr>
-						<td><strong>Grand Total:</strong></td>
-						<td><strong syle="font-size:20px;">'.currency($order_total).'</strong></td>
+			<tr>
+				<td><strong>Grand Total:</strong></td>
+				<td><strong syle="font-size:20px;">'.currency($order_total).'</strong></td>
 
-					</tr>
+			</tr>
 			';
 			$html.='</table>';
 			$data = array('html'=>$html, 'total'=>$order_total);
 			return $data;
-	}
-
-	function get_charges($type = '')
-	{
-		$CI = & get_instance();
-		$query = $CI->db->get_where(TABLE_CHARGES, array('status'=>1, 'type'=>$type));
-		if($query->num_rows() < 1)
-		 return array();
-		$i = 0;
-		foreach($query->result() as $row){
-			$data[$i]['charge'] = $row->name;
-			$data[$i]['value'] = $row->value;
-			$i++;
 		}
-		return $data;
-	}
 
-	function currency($number = 0)
-	{
-		return APP_CURRENCY.number_format(intval($number),2);
-	}
+		function get_charges($type = '')
+		{
+			$CI = & get_instance();
+			$query = $CI->db->get_where(TABLE_CHARGES, array('status'=>1, 'type'=>$type));
+			if($query->num_rows() < 1)
+				return array();
+			$i = 0;
+			foreach($query->result() as $row){
+				$data[$i]['charge'] = $row->name;
+				$data[$i]['value'] = $row->value;
+				$i++;
+			}
+			return $data;
+		}
 
-	function clear_cache()
-	{
-		$CI = & get_instance();
-		$CI->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
-    $CI->output->set_header("Pragma: no-cache");
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
-		return true;
-	}
+		function currency($number = 0)
+		{
+			return APP_CURRENCY.number_format(intval($number),2);
+		}
 
-	function order_is_completed($order_id)
-	{
-		//$table='', $where=array(), $cell=''
-		if(get_cell(TABLE_ORDERS, array('id'=>$order_id), 'status') == 'completed') {
+		function clear_cache()
+		{
+			$CI = & get_instance();
+			$CI->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
+			$CI->output->set_header("Pragma: no-cache");
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+			header( 'Cache-Control: post-check=0, pre-check=0', false );
+			header( 'Pragma: no-cache' );
 			return true;
-		} else {
-			return false;
 		}
-	}
+
+		function order_is_completed($order_id)
+		{
+		//$table='', $where=array(), $cell=''
+			if(get_cell(TABLE_ORDERS, array('id'=>$order_id), 'status') == 'completed') {
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 
-	function send_order_mail($order_id = 0)
-	{
-		$CI = & get_instance();
-		$data['order'] = get_row(TABLE_ORDERS, array('id'=>$order_id));
-				$config = Array(
-						'protocol' => 'smtp',
-		        'smtp_host' => 'mail.wetindey.com.ng',
-		        'smtp_port' => 25,
-		        'smtp_user' => 'orders@wetindey.com.ng',
-		        'smtp_pass' => 'cynosure',
-		        'mailtype'  => 'html',
-		        'charset' => 'utf-8',
-		        'wordwrap' => TRUE
+		function send_order_mail($order_id = 0)
+		{
+			$CI = & get_instance();
+			$data['order'] = get_row(TABLE_ORDERS, array('id'=>$order_id));
+			$config = Array(
+				'protocol' => 'smtp',
+				'smtp_host' => 'mail.wetindey.com.ng',
+				'smtp_port' => 25,
+				'smtp_user' => 'orders@wetindey.com.ng',
+				'smtp_pass' => 'cynosure',
+				'mailtype'  => 'html',
+				'charset' => 'utf-8',
+				'wordwrap' => TRUE
 
-		    );
-    $CI->load->library('email', $config);
-    $CI->email->set_newline("\r\n");
-    $CI->email->from('orders@wetindey.com.ng', 'WETIN DEY ONLINE STORE');
-    $CI->email->to('vadeshayo@gmail.com');
-    $CI->email->subject('New Order Notification');
-    $body = $CI->load->view('emails/order.php', $data,TRUE);
-    $CI->email->message($body);
-    $CI->email->send();
-		return true;
-    }
+				);
+			$CI->load->library('email', $config);
+			$CI->email->set_newline("\r\n");
+			$CI->email->from('orders@wetindey.com.ng', 'WETIN DEY ONLINE STORE');
+			$CI->email->to('vadeshayo@gmail.com');
+			$CI->email->subject('New Order Notification');
+			$body = $CI->load->view('emails/order.php', $data,TRUE);
+			$CI->email->message($body);
+			$CI->email->send();
+			return true;
+		}
+
+		function send_order_mail_to_customer($order_id = 0)
+		{
+			$CI = & get_instance();
+			$data['order'] = get_row(TABLE_ORDERS, array('id'=>$order_id));
+			if($data['order']->customer_id == 0) {
+				$customer_email = $data['order']->guest_email;
+			} else {
+				$customer_email = get_cell(TABLE_CUSTOMERS, array('id'=>$data['order']->customer_id), 'email');
+			}
+			$config = Array(
+				'protocol' => 'smtp',
+				'smtp_host' => 'mail.wetindey.com.ng',
+				'smtp_port' => 25,
+				'smtp_user' => 'orders@wetindey.com.ng',
+				'smtp_pass' => 'cynosure',
+				'mailtype'  => 'html',
+				'charset' => 'utf-8',
+				'wordwrap' => TRUE
+
+				);
+			$CI->load->library('email', $config);
+			$CI->email->set_newline("\r\n");
+			$CI->email->from('orders@wetindey.com.ng', 'WETIN DEY ONLINE STORE');
+			$CI->email->to($customer_email);
+			$CI->email->subject('New Order Notification');
+			$body = $CI->load->view('emails/customer_order.php', $data,TRUE);
+			$CI->email->message($body);
+			$CI->email->send();
+			return true;
+		}

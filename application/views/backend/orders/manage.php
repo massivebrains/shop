@@ -48,21 +48,20 @@
 										<div class="col-lg-12 col-md-12">
 
 											<div class="clearfix"></div>
-												<table class="table " id="ordersDataTable">
-													<thead>
-														<tr>
-                              <td>DATE</td>
-                              <td>ORDER NUMBER</td>
-  														<td>CUSTOMER NAME</td>
-															<td>DELIVERY ADDRESS</td>
-  														<td>DELIVERY OPTION</td>
-  														<td>ORDER STATUS</td>
-  														<td>ORDER TOTAL</td>
-  														<td>DELIVERY STATUS</td>
-  														<td>PAYMENT METHOD</td>
-  														<td>ACTION</td>
-														</tr>
-													</thead>
+											<table class="table " id="ordersDataTable">
+												<thead>
+													<tr>
+														<td>DATE</td>
+														<td>ORDER NUMBER</td>
+														<td>CUSTOMER NAME</td>
+														<td>DELIVERY OPTION</td>
+														<td>ORDER STATUS</td>
+														<td>ORDER TOTAL</td>
+														<td>DELIVERY STATUS</td>
+														<td>PAYMENT METHOD</td>
+														<td>ACTION</td>
+													</tr>
+												</thead>
 
 
 											</table>
@@ -92,13 +91,13 @@
 </body>
 
 <script type="text/javascript">
-$(document).ready(function() {
-	var url = "<?php echo site_url('backend/orders/data') ?>";
-	$('#ordersDataTable').DataTable( {
-		"ajax":{
-			"url": url,
-		}
+	$(document).ready(function() {
+		var url = "<?php echo site_url('backend/orders/data') ?>";
+		$('#ordersDataTable').DataTable( {
+			"ajax":{
+				"url": url,
+			}
+		});
 	});
-});
 </script>
 </html>
